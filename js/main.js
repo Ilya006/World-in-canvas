@@ -22,8 +22,6 @@ function draw() {
     graphEditor.display()
     window.requestAnimationFrame(animation)
   }
-
-  window.graph = graph
 }
 
 window.addEventListener('load', draw)
