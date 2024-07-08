@@ -14,43 +14,45 @@ class GraphEditor {
   }
 
   #addEventListeners() {
-    this.canvas.addEventListener('mousedown', ({ button, offsetX, offsetY }) => {
-      if (button === 0) { // left click
-        if (this.hovered) {
-          this.#select(this.hovered)
-          this.selected = this.hovered
-          this.dragging = true
-          return
-        } else {
-          this.#select(this.mouse)
-        }
-  
-        this.graph.addPoint(this.mouse)
-        this.selected = this.mouse
-        this.hovered = this.mouse
-      }
-
-      if (button === 2) { // right click
-        if (this.hovered) {
-          this.#removePoint(this.hovered)
-        } else {
-          this.selected = null
-        }
-      }
-    })
-
-    this.canvas.addEventListener('mousemove', ({ offsetX, offsetY }) => {
-      this.mouse = new Point(offsetX, offsetY)
-      this.hovered = getNearestPoint(this.mouse, this.graph.points, 10)
-
-      if (this.dragging) {
-        this.selected.x = this.mouse.x
-        this.selected.y = this.mouse.y
-      }
-    })
-
+    this.canvas.addEventListener('mousedown', this.#handleMouseDown.bind(this))
+    this.canvas.addEventListener('mousemove', this.#handleMouseMove.bind(this))
     this.canvas.addEventListener('contextmenu', (event) => event.preventDefault())
     this.canvas.addEventListener('mouseup', () => this.dragging = false)
+  }
+
+  #handleMouseDown({ button, offsetX, offsetY }) {
+    if (button === 0) { // left click
+      if (this.hovered) {
+        this.#select(this.hovered)
+        this.selected = this.hovered
+        this.dragging = true
+        return
+      } else {
+        this.#select(this.mouse)
+      }
+
+      this.graph.addPoint(this.mouse)
+      this.selected = this.mouse
+      this.hovered = this.mouse
+    }
+
+    if (button === 2) { // right click
+      if (this.selected) {
+        this.selected = null
+      } else if (this.hovered) {
+        this.#removePoint(this.hovered)
+      }
+    }
+  }
+
+  #handleMouseMove({ offsetX, offsetY }) {
+    this.mouse = new Point(offsetX, offsetY)
+    this.hovered = getNearestPoint(this.mouse, this.graph.points, 10)
+
+    if (this.dragging) {
+      this.selected.x = this.mouse.x
+      this.selected.y = this.mouse.y
+    }
   }
 
   #removePoint(point) {
